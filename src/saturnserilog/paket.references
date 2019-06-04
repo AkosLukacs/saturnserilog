@@ -5,3 +5,5 @@ Dapper
 Microsoft.Data.Sqlite
 
 dotnet-saturn
+Giraffe.SerilogExtensions
+Serilog.Sinks.Console

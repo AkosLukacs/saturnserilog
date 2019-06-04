@@ -3,16 +3,22 @@ module Server
 open Saturn
 open Config
 
+open Giraffe.SerilogExtensions
+open Serilog
+open Serilog.Formatting.Json
+
 let endpointPipe = pipeline {
     plug head
     plug requestId
 }
 
+let webAppWithLogging = SerilogAdapter.Enable(Router.appRouter)
+
 let app = application {
     pipe_through endpointPipe
 
     error_handler (fun ex _ -> pipeline { render_html (InternalError.layout ex) })
-    use_router Router.appRouter
+    use_router webAppWithLogging
     url "http://0.0.0.0:8085/"
     memory_cache
     use_static "static"
@@ -23,5 +29,12 @@ let app = application {
 [<EntryPoint>]
 let main _ =
     printfn "Working directory - %s" (System.IO.Directory.GetCurrentDirectory())
+    Log.Logger <-
+      LoggerConfiguration()
+        // add native destructuring
+        .Destructure.FSharpTypes()
+        // from Serilog.Sinks.Console
+        .WriteTo.Console()
+        .CreateLogger()
     run app
     0 // return an integer exit code
