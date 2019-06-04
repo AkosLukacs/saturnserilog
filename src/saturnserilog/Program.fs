@@ -9,7 +9,7 @@ open Serilog.Formatting.Json
 
 let endpointPipe = pipeline {
     plug head
-    plug requestId
+    // plug requestId
 }
 
 let webAppWithLogging = SerilogAdapter.Enable(Router.appRouter)
